@@ -1,17 +1,16 @@
 # CLI Stock Market Order Matching Engine
 
 Terminal-based multithreaded limit order matching engine implemented in Java.
-Implements strict price-time priority matching, persists executed
-trades to an embedded H2 database, and maintains an auditable text
-log of all operations. No GUI required.
+Implements strict price-time priority matching and persists executed
+trades to an embedded H2 database. Features no GUI.
 
 ## Highlights
 
-- Strict price-time priority matching with TreeMap + LinkedList
+- Strict price-time priority matching via TreeMap + LinkedList
 - Thread-local order books with ReentrantReadWriteLock
-- Fixed thread pool for concurrent order processing
-- Embedded H2 database (no server required)
-- Character-based audit logging
+- Fixed size thread pool for concurrent order processing
+- Embedded H2 database (no server needed)
+- Character based audit logging
 - REPL, batch CSV import, and simulation modes included
 
 ## Requirements
@@ -20,56 +19,56 @@ log of all operations. No GUI required.
 - Maven 3.8+
 
 ## Project Structure
-
 ```
+
 order-matching-engine/
 ├── pom.xml
 ├── README.md
 ├── sample_orders.csv
 └── src/main/java/com/engine/
-    ├── Main.java
-    ├── model/
-    │   ├── Order.java
-    │   ├── Trade.java
-    │   ├── Side.java
-    │   └── OrderType.java
-    ├── core/
-    │   ├── OrderBook.java
-    │   └── MatchingEngine.java
-    ├── persistence/
-    │   ├── DatabaseManager.java
-    │   └── AuditLogger.java
-    └── simulation/
-        └── MarketSimulator.java
+├── Main.java
+├── model/
+│  ├── Order.java
+│  ├── Trade.java
+│  ├── Side.java
+│  └── OrderType.java
+├── core/
+│  ├── OrderBook.java
+│  └── MatchingEngine.java
+├── persistence/
+│  ├── DatabaseManager.java
+│  └── AuditLogger.java
+└── simulation/
+└── MarketSimulator.java
 ```
 
 ## Building
 
 From the project root:
-
 ```
+
 mvn clean package
 ```
 
 This will produce an executable JAR in
-
 ```
+
 target/order-matching-engine.jar
 ```
 
-The H2 JDBC driver is included in the package via Maven Shade plugin.
+The H2 JDBC driver has been included with the package using the Maven Shade plugin.
 
 ## Usage
 
 ### 1. Interactive mode
-
 ```
+
 java -jar target/order-matching-engine.jar
 ```
 
 You will be presented with a `>` prompt. Example session:
-
 ```
+
 > order AAPL buy limit 189.50 100 alice
 Submitted: Order#1[AAPL BUY LIMIT qty=100/100 price=189.50 client=alice]
 No immediate match; order resting on book (or fully consumed if market).
@@ -77,18 +76,18 @@ No immediate match; order resting on book (or fully consumed if market).
 > order AAPL sell limit 189.50 60 bob
 Submitted: Order#2[AAPL SELL LIMIT qty=0/60 price=189.50 client=bob]
 Matched 1 trade(s):
-  Trade#1[AAPL buy=1 sell=2 qty=60 @ 189.50]
+Trade#1[AAPL buy=1 sell=2 qty=60 @ 189.50]
 
 > book AAPL
 Order Book: AAPL
-BIDS           | ASKS
+BIDS      | ASKS
 ------------------------------------
-189.50 x40    |
+189.50 x40  |
 
 > stats
 Orders processed : 2
-Trades executed  : 1
-Trades in DB   : 1
+Trades executed : 1
+Trades in DB  : 1
 
 > exit
 Shutting down...
@@ -97,22 +96,22 @@ Shutting down...
 Type `help` at the `>` prompt to see available commands.
 
 ### 2. Batch mode
-
 ```
+
 java -jar target/order-matching-engine.jar --batch sample_orders.csv
 ```
 
 The CSV file should have the following format:
-
 ```
+
 symbol,side,type,price,quantity,clientId
 ```
 
 Leave price column empty for MARKET orders. See `sample_orders.csv` for reference.
 
 ### 3. Simulation mode
-
 ```
+
 java -jar target/order-matching-engine.jar --simulate --threads 8 --orders 5000
 ```
 
